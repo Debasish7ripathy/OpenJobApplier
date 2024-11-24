@@ -18,8 +18,8 @@ Follow these steps to set up the project:
 1. **Clone the Repository**: If you have Git installed, run the following command to clone the repository. If not, you can download the ZIP file from the repository.
 
     ```bash
-    git clone <repository-url>
-    cd <repository-directory>
+    git clone https://github.com/Debasish7ripathy/OpenJobApplier
+    cd OpenJobApplier
     ```
 
 2. **Install Required Packages**: Open a terminal or command prompt in the project directory and run the following command to install Flask and other dependencies:
