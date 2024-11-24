@@ -83,4 +83,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Thanks to the developers of Flask and other open-source libraries used in this project.
 - Special thanks to [Your Name] for developing and maintaining this project.
 
-# OpenJobApplier
