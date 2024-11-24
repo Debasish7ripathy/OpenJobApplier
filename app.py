@@ -13,11 +13,11 @@ from pdf import userData
 app = Flask(__name__)
 
 # Email credentials
-sender_email = "debasishtripathy2021@gmail.com"
-sender_password = "hedd apsn okqd sgxt"
+sender_email = "Youremail"
+sender_password = "Password"
 
 # API key configuration (ensure your key is valid)
-genai.configure(api_key="AIzaSyBdnBnERl5HvqTx2mp0lTBs2b7S_LSB2ck")
+genai.configure(api_key="apikey")
 
 # Prompt for generating content in CSV format
 messagetoCsvPrompt = '''Use the below information and return the output in this csv format:
@@ -112,7 +112,7 @@ def index():
                         if name != "nan":
                             subject = model.generate_content(f'use the below data to apply for the {role} for {name} for following job write a subject only give a normal '+userData()).text
                             body = model.generate_content(f'use the below data to apply for the {role} for {name} for experience year of {experience} at {location} for following job write a mail only give a normal body for mail do not use any place holders all details are mentionedn and over exacurate my profile '+userData()).text
-                            attachment_path = 'Resume_Debasish_Research.pdf'
+                            attachment_path = 'resume_Research.pdf'
 
                             send_email(sender_email, sender_password, email, subject, body, attachment_path)
             return "Emails sent successfully!"
