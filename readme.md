@@ -77,9 +77,9 @@ To start the application, follow these steps:
 Contributions are welcome! If you have suggestions or improvements, please create a pull request or submit an issue.
 
 ## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the Affero General Public License - see the LICENSE file for details.
 
 ## Acknowledgments
 - Thanks to the developers of Flask and other open-source libraries used in this project.
-- Special thanks to [Your Name] for developing and maintaining this project.
+- Special thanks to [DebasishTripathy] for developing and maintaining this project.
 
