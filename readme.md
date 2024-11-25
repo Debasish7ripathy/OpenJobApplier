@@ -83,3 +83,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Thanks to the developers of Flask and other open-source libraries used in this project.
 - Special thanks to [DebasishTripathy](https://github.com/DebasishTripathy13) for developing and maintaining this project.
 
+## Note
+- Try to use ChatGPT if some small error occur😉
+
