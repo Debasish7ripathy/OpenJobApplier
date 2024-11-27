@@ -9,44 +9,31 @@ import google.generativeai as genai
 import csv
 from pdf import userData
 
-# Flask app initialization
 app = Flask(__name__)
 
-# Email credentials
-sender_email = "Youremail"
-sender_password = "Password"
+SENDER_EMAIL = "youremail@gmail.com"
+SENDER_PASSWORD = "Password"
 
-# API key configuration (ensure your key is valid)
-genai.configure(api_key="apikey")
+genai.configure(api_key="your-api-key")
 
-# Prompt for generating content in CSV format
-messagetoCsvPrompt = '''Use the below information and return the output in this csv format:
-CompanyName,Role,Experience,Location,Applicationlink,Email
-If some values are not available, use "nan".
+CSV_PROMPT = '''Use the below information and return the output in this CSV format:
+CompanyName, Role, Experience, Location, ApplicationLink, Email
+If any values are not available, use "nan".
 '''
-bodymsg=(
-    f"Write a professional email for {name} applying for the {role} position at {location}. "
-    f"{name} has {experience} years of experience in the industry and is highly skilled in "
-    "relevant areas. Provide a formal yet convincing body for the email, highlighting the candidate's expertise "
-    "and enthusiasm for the role, without using any placeholders or over-exaggerating the profile. "
-    "Ensure the content is well-structured, concise, and clear.")
 
-# Model configuration
-generation_config = {
+GENERATION_CONFIG = {
     "temperature": 1,
     "top_p": 0.95,
     "top_k": 40,
     "response_mime_type": "text/plain",
 }
 
-# Create the model instance
 model = genai.GenerativeModel(
     model_name="gemini-1.5-flash",
-    generation_config=generation_config,
+    generation_config=GENERATION_CONFIG,
 )
 
 def send_email(sender_email, sender_password, recipient_email, subject, body, attachment_path):
-    """Send an email with attachment."""
     msg = MIMEMultipart()
     msg['From'] = sender_email
     msg['To'] = recipient_email
@@ -74,16 +61,14 @@ def send_email(sender_email, sender_password, recipient_email, subject, body, at
     except Exception as e:
         print(f"Error sending email: {e}")
 
-def messageToCsv(data, csv_filename='data.csv'):
-    """Writes the provided data to a CSV file."""
+def message_to_csv(data, csv_filename='data.csv'):
     with open(csv_filename, 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(data)
 
-def generateJobData(input_data):
-    """Generates job data from input using the generative model."""
+def generate_job_data(input_data):
     try:
-        response = model.generate_content([messagetoCsvPrompt] + input_data.split("\n"))
+        response = model.generate_content([CSV_PROMPT] + input_data.split("\n"))
         response_text = response.text.replace("```csv", "").replace("```", "")
         print(f"Generated response:\n{response_text}")
 
@@ -104,23 +89,34 @@ def index():
         if not input_details:
             return "No job description provided.", 400
 
-        job_data = generateJobData(input_details)
+        job_data = generate_job_data(input_details)
 
         if job_data:
-            messageToCsv(job_data, 'output_jobs.csv')
-            # Read the CSV file and send emails
+            message_to_csv(job_data, 'output_jobs.csv')
+
             with open('output_jobs.csv', 'r') as file:
                 reader = csv.reader(file)
                 for row in reader:
-                    if len(row) >= 6:  # Ensure the row has at least 6 columns
-                        name, role, experience, location, applicationlink, email = row
+                    if len(row) >= 6:
+                        company_name, role, experience, location, application_link, email = row
 
-                        if name != "nan":
-                            subject = model.generate_content(f'use the below data to apply for the {role} for {name} for following job write a subject only give a normal '+userData()).text
-                            body = model.generate_content(bodymsg).text
-                            attachment_path = 'resume_Research.pdf'
+                        if company_name != "nan":
+                            subject_prompt = f"Generate a subject line for a job application for {role} at {company_name}."
+                            subject = model.generate_content(subject_prompt).text
 
-                            send_email(sender_email, sender_password, email, subject, body, attachment_path)
+                            body_prompt = (
+                                f"Write a professional email for {company_name} applying for the {role} position at {location}. "
+                                f"{company_name} has {experience} years of experience in the industry and is highly skilled in relevant areas. "
+                                "Provide a formal yet convincing body for the email, highlighting the candidate's expertise "
+                                "and enthusiasm for the role, without using any placeholders or over-exaggerating the profile. "
+                                "Ensure the content is well-structured, concise, and clear."
+                            )
+                            body = model.generate_content(body_prompt).text
+
+                            attachment_path = 'Path to your resume'
+
+                            send_email(SENDER_EMAIL, SENDER_PASSWORD, email, subject, body, attachment_path)
+
             return "Emails sent successfully!"
 
         return "No data to process.", 400
