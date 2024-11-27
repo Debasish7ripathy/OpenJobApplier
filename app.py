@@ -24,6 +24,12 @@ messagetoCsvPrompt = '''Use the below information and return the output in this 
 CompanyName,Role,Experience,Location,Applicationlink,Email
 If some values are not available, use "nan".
 '''
+bodymsg=(
+    f"Write a professional email for {name} applying for the {role} position at {location}. "
+    f"{name} has {experience} years of experience in the industry and is highly skilled in "
+    "relevant areas. Provide a formal yet convincing body for the email, highlighting the candidate's expertise "
+    "and enthusiasm for the role, without using any placeholders or over-exaggerating the profile. "
+    "Ensure the content is well-structured, concise, and clear.")
 
 # Model configuration
 generation_config = {
@@ -111,7 +117,7 @@ def index():
 
                         if name != "nan":
                             subject = model.generate_content(f'use the below data to apply for the {role} for {name} for following job write a subject only give a normal '+userData()).text
-                            body = model.generate_content(f'use the below data to apply for the {role} for {name} for experience year of {experience} at {location} for following job write a mail only give a normal body for mail do not use any place holders all details are mentionedn and over exacurate my profile '+userData()).text
+                            body = model.generate_content(bodymsg).text
                             attachment_path = 'resume_Research.pdf'
 
                             send_email(sender_email, sender_password, email, subject, body, attachment_path)
