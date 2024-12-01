@@ -66,7 +66,7 @@ To start the application, follow these steps:
 4. **Email Sending**: The application will process the job descriptions, generate the necessary data, and send application emails to the specified addresses.
 
 ## Configuration
-- **Resume Attachment**: Ensure your resume file is named `Resume_Debasish_Research.pdf` and is located in the project directory. Update the file path in the code if your resume is named differently or located elsewhere.
+- **Resume Attachment**: Ensure your resume file is named `Resume_yourname_role.pdf` and is located in the project directory. Update the file path in the code if your resume is named differently or located elsewhere.
 - **AI Model Configuration**: The application uses a generative AI model to process input data. Ensure you have a valid API key for the `google-generativeai` library and that it is correctly configured in the application code.
 
 ## Troubleshooting
@@ -84,5 +84,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Special thanks to [DebasishTripathy](https://github.com/DebasishTripathy13) for developing and maintaining this project.
 
 ## Note
-- Try to use ChatGPT if some small error occur😉
+- Try to use ChatGPT if some small error occur😉 or Raise an issue it will be resolved
 
