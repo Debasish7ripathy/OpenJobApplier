@@ -8,21 +8,31 @@ import os
 import google.generativeai as genai
 import csv
 from pdf import userData
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Flask app initialization
 app = Flask(__name__)
 
 # Email credentials
-sender_email = "Youremail"
-sender_password = "Password"
-
+sender_email =os.getenv('SENDER_EMAIL')
+sender_password = os.getenv('PASSWORD')
+print(userData())
 # API key configuration (ensure your key is valid)
-genai.configure(api_key="apikey")
+genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 
 # Prompt for generating content in CSV format
 messagetoCsvPrompt = '''Use the below information and return the output in this csv format:
 CompanyName,Role,Experience,Location,Applicationlink,Email
 If some values are not available, use "nan".
+make sure there are no commas "," in location is one fileld only and experience and role and name and make sure that example like cityname,country its only cityname 
+if two emails are there create two rows with same data and different emails
+this is the format of the csv file that you need to return CompanyName,Role,Experience,Location,Applicationlink,Email
+do it correctly you can find email in place of application link too so verify and then place email it correct place and make sure that you do not make any mistakes in the csv file
+if multiple roles or multiple email are available create different enteries for them and make sure that you do not make any mistakes in the csv file
+and make sure you donot use multiple commmas too for any particular field as it will be considered as a new field especaially in location and role and experience and name make them to single or 3 worda at max and check if this error can occur ValueError: too many values to unpack (expected 6) if so resolve and give a correct csv
+
 '''
 
 # Model configuration
@@ -35,7 +45,7 @@ generation_config = {
 
 # Create the model instance
 model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",
+    model_name="gemini-1.5-pro",
     generation_config=generation_config,
 )
 
@@ -110,9 +120,9 @@ def index():
                         name, role, experience, location, applicationlink, email = row
 
                         if name != "nan":
-                            subject = model.generate_content(f'use the below data to apply for the {role} for {name} for following job write a subject only give a normal '+userData()).text
-                            body = model.generate_content(f'use the below data to apply for the {role} for {name} for experience year of {experience} at {location} for following job write a mail only give a normal body for mail do not use any place holders all details are mentionedn and over exacurate my profile '+userData()).text
-                            attachment_path = 'resume_Research.pdf'
+                            subject = generate_email_subject(name, role)
+                            body = create_email_content(name, role, experience, location)
+                            attachment_path = 'Resume_Debasish_Research.pdf'
 
                             send_email(sender_email, sender_password, email, subject, body, attachment_path)
             return "Emails sent successfully!"
@@ -120,6 +130,21 @@ def index():
         return "No data to process.", 400
 
     return render_template('index.html')
+
+def generate_email_subject(name, role):
+    subject = model.generate_content(f'use the below data to apply for the {role} for {name} for following job write a subject only give a normal '+userData()).text
+    return subject
+
+def create_email_content(name, role, experience, location):
+    body = model.generate_content(
+        f'use the below data to apply for the {role} for {name} for experience year of {experience} at {location} '
+        f'for following job write a mail only give a normal body for mail do not use any place holders all details '
+        f'are mentioned and over exaggerate my profile make it as professional as possible and make sure that you '
+        f'try to make it consize but informative'
+        f'make it as professional as possible and make sure that you present me in a very over exaggerated manner{userData()}'
+
+    ).text
+    return body
 
 if __name__ == '__main__':
     app.run(debug=True)

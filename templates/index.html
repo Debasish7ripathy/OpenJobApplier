@@ -3,24 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Data Generator</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>AI Job Matrix - Neural Network Interface</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --cyber-yellow: #f0db4f;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: #0a0a2e;
+            color: #fff;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, rgba(0,243,255,0.1) 0%, rgba(255,0,255,0.1) 100%),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0%,
+                    transparent 1px,
+                    rgba(0, 243, 255, 0.1) 1px,
+                    rgba(0, 243, 255, 0.1) 2px
+                );
+            z-index: -1;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: rgba(10, 10, 46, 0.9);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue),
+                        inset 0 0 20px var(--neon-blue);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            z-index: -1;
+            border-radius: 17px;
+            opacity: 0.3;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px var(--neon-blue);
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 0 0 10px var(--neon-blue); }
+            25% { text-shadow: -2px 0 var(--neon-pink), 2px 0 var(--neon-blue); }
+            50% { text-shadow: 0 0 10px var(--neon-blue); }
+            75% { text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-blue); }
+            100% { text-shadow: 0 0 10px var(--neon-blue); }
+        }
+
+        textarea {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--neon-blue);
+            color: var(--cyber-yellow);
+            font-family: 'Share Tech Mono', monospace;
+            resize: vertical;
+            min-height: 150px;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            box-shadow: 0 0 15px var(--neon-blue);
+            outline: none;
+        }
+
+        .cyber-button {
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .cyber-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(0, 243, 255, 0.4),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .cyber-button:hover::before {
+            left: 100%;
+        }
+
+        .cyber-button:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .ai-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 15px;
+            height: 15px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
 </head>
-<body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Job Data Generator</h1>
-        <form method="post" action="/">
-            <div class="form-group">
-                <label for="job_description">Enter Job Descriptions:</label>
-                <textarea class="form-control" id="job_description" name="job_description" rows="10" required></textarea>
-                <small class="form-text text-muted">Enter each job description on a new line.</small>
+<body class="antialiased">
+    <canvas class="matrix-bg" id="matrixCanvas"></canvas>
+    <div class="container">
+        <div class="ai-indicator"></div>
+        <div class="text-center mb-6">
+            <h1 class="text-4xl font-bold mb-2">Neural Job Matrix</h1>
+            <p class="text-lg text-cyan-400">AI-Powered Employment Data Processing Interface</p>
+        </div>
+        
+        <form id="jobForm" method="post" action="/" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium mb-2 text-cyan-400">
+                    Initialize Job Parameters 
+                    <span class="ml-2 text-pink-500">[AI-ASSIST ACTIVE]</span>
+                </label>
+                <textarea 
+                    id="job_description" 
+                    name="job_description" 
+                    class="w-full rounded-md p-3"
+                    placeholder="// INPUT JOB PARAMETERS
+>> Format: [POSITION] @ [ORGANIZATION]
+>> Example: Quantum Computing Engineer @ NeuroCorp
+>> Neural Network Architect @ CyberSys Industries"
+                    required
+                    rows="6"
+                ></textarea>
+                <p class="mt-2 text-sm text-cyan-400">
+                    <span class="font-medium text-pink-500">[SYSTEM]:</span> Optimize input for maximum AI processing efficiency
+                </p>
             </div>
-            <button type="submit" class="btn btn-primary">Generate and Send Emails</button>
+            
+            <button 
+                type="submit" 
+                class="cyber-button w-full py-3 rounded-md"
+            >
+                INITIALIZE NEURAL PROCESSING
+            </button>
         </form>
+
+        <div id="errorContainer" class="mt-4 hidden">
+            <div id="errorMessage" class="bg-red-900 border border-red-500 text-red-300 px-4 py-3 rounded relative" role="alert">
+            </div>
+        </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Matrix rain effect
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const nums = '0123456789';
+        const alphabet = katakana + latin + nums;
+
+        const fontSize = 16;
+        const columns = canvas.width/fontSize;
+
+        const rainDrops = Array(Math.floor(columns)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+
+            for(let i = 0; i < rainDrops.length; i++) {
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                ctx.fillText(text, i*fontSize, rainDrops[i]*fontSize);
+                
+                if(rainDrops[i]*fontSize > canvas.height && Math.random() > 0.975){
+                    rainDrops[i] = 0;
+                }
+                rainDrops[i]++;
+            }
+        }
+
+        setInterval(draw, 30);
+
+        // Form handling
+        document.getElementById('jobForm').addEventListener('submit', function(e) {
+            const textarea = document.getElementById('job_description');
+            const lines = textarea.value.trim().split('\n').filter(line => line.trim() !== '');
+            
+            if (lines.length === 0) {
+                e.preventDefault();
+                const errorContainer = document.getElementById('errorContainer');
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = '[ERROR]: Neural network requires minimum input parameters.';
+                errorContainer.classList.remove('hidden');
+                textarea.focus();
+            }
+        });
+
+        document.getElementById('job_description').addEventListener('input', function() {
+            const errorContainer = document.getElementById('errorContainer');
+            if (!errorContainer.classList.contains('hidden')) {
+                errorContainer.classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 </html>

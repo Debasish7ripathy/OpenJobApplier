@@ -16,6 +16,7 @@ def userData():
             # Safely print the text
             try:
                 return(f"Page {page_num + 1} Text:\n{text}\n")
+                print(f"Page {page_num + 1} Text:\n{text}\n")
             except UnicodeEncodeError:
                 return(f"Page {page_num + 1} Text (encoding error):\n{repr(text)}\n")
 
