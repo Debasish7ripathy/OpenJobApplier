@@ -1,5 +1,3 @@
-Here's the **README.md** content in proper Markdown format:
-
 ```markdown
 # OpenJobApplier
 
@@ -134,6 +132,8 @@ This project is licensed under the **MIT License**. See the `LICENSE` file for d
 - **Flask**: Lightweight and powerful web framework for Python.
 - **Google Generative AI**: For enabling the transformation of job descriptions.
 - Special thanks to the contributors and the open-source community!
-```
 
-Save this as `README.md` in your project root directory.
+---
+
+Feel free to copy and customize the content further based on additional project details or personal preferences.
+```
